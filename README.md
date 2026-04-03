@@ -61,7 +61,7 @@ sudo apt install -y python3-rosdep
 rosdep update
 
 cd <your_ws>/src
-git clone https://github.com/anujjain-dev/unitree-go2-ros2.git
+git clone https://github.com/rento120162/unitree_go2_Navigation.git
 cd <your_ws>
 rosdep install --from-paths src --ignore-src -r -y
 ```
