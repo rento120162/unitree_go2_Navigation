@@ -41,7 +41,7 @@ def generate_launch_description():
 	        output='screen',
             parameters=[rl_params_file, {"use_sim_time": True}],
             remappings=[('imu/data', '/imu/data'),
-                        ('lio_odom/odom', '/Odometry'),
+                        ('lio_odom/odom', '/odom_fixed'),
                         ('odometry/filtered', '/odometry/local')]           
            ),
     launch_ros.actions.Node(
