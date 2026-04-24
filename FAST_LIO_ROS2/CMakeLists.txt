@@ -98,6 +98,9 @@ target_include_directories(fastlio_mapping PUBLIC
   $<INSTALL_INTERFACE:include>
   ${PCL_INCLUDE_DIRS}
 )
+add_executable(frame_changer src/frame_changer.cpp)
+ament_target_dependencies(frame_changer ${dependencies})
+
 target_link_libraries(fastlio_mapping ${PCL_LIBRARIES} ${PYTHON_LIBRARIES} Eigen3::Eigen)
 target_include_directories(fastlio_mapping PRIVATE ${PYTHON_INCLUDE_DIRS})
 
@@ -116,7 +119,9 @@ endif()
 ament_target_dependencies(fastlio_mapping ${dependencies})
 
 # ---------------- Install --------------- #
-install(TARGETS fastlio_mapping
+install(TARGETS 
+  fastlio_mapping
+  frame_changer
   DESTINATION lib/${PROJECT_NAME}
 )
 

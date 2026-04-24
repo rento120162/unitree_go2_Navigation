@@ -211,7 +211,7 @@ global_costmap:
         enabled: True
         observation_sources: pointcloud
         pointcloud:
-          topic: /lio_sam/mapping/cloud_registered
+          topic: /cloud_registed_fixed
           max_obstacle_height: 2.0
           clearing: True
           marking: True
