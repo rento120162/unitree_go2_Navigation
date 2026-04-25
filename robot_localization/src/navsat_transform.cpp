@@ -620,40 +620,45 @@ void NavSatTransform::gpsFixCallback(
   // Make sure the GPS data is usable
   bool good_gps =
     (msg->status.status > sensor_msgs::msg::NavSatStatus::STATUS_FIX &&
-    msg->position_covariance[0] + msg->position_covariance[4] < gpsCovThreshold_ &&
+    msg->position_covariance[0] + msg->position_covariance[4] < gpsCovThreshold_
     !std::isnan(msg->altitude) && !std::isnan(msg->latitude) &&
     !std::isnan(msg->longitude));
 
-  if (good_gps) {
-    // If we haven't computed the transform yet, then
-    // store this message as the initial GPS data to use
-    if (!transform_good_ && !use_manual_datum_) {
-      setTransformGps(msg);
-    }
-
-    double cartesian_x = 0;
-    double cartesian_y = 0;
-    std::string cartesian_zone_tmp;
-    navsat_conversions::LLtoUTM(
+  double cartesian_x = 0;
+  double cartesian_y = 0;
+  std::string cartesian_zone_tmp;
+      
+  navsat_conversions::LLtoUTM(
       msg->latitude,
       msg->longitude,
       cartesian_y,
       cartesian_x,
       cartesian_zone_tmp);
-    latest_cartesian_pose_.setOrigin(tf2::Vector3(cartesian_x, cartesian_y, msg->altitude));
-    latest_cartesian_covariance_.setZero();
-
-    // Copy the measurement's covariance matrix so that we can rotate it later
-    for (size_t i = 0; i < POSITION_SIZE; i++) {
-      for (size_t j = 0; j < POSITION_SIZE; j++) {
-        latest_cartesian_covariance_(i, j) =
-          msg->position_covariance[POSITION_SIZE * i + j];
+  
+  latest_cartesian_pose_.setOrigin(
+      tf2::Vector3(cartesian_x, cartesian_y, msg->altitude));
+  
+  latest_cartesian_covariance_.setZero();
+  
+  if (good_gps) {
+      for (size_t i = 0; i < POSITION_SIZE; i++) {
+          for (size_t j = 0; j < POSITION_SIZE; j++) {
+              latest_cartesian_covariance_(i, j) =
+                  msg->position_covariance[POSITION_SIZE * i + j];
+          }
       }
-    }
+      if (!transform_good_ && !use_manual_datum_) {
+          setTransformGps(msg);
+      }
+  } else {
+    latest_cartesian_covariance_(0,0) = 1e6;
+    latest_cartesian_covariance_(1,1) = 1e6;
+    latest_cartesian_covariance_(2,2) = 1e6;
+}
 
-    gps_update_time_ = msg->header.stamp;
-    gps_updated_ = true;
-  } else gps_updated_ = false;
+gps_update_time_ = msg->header.stamp;
+gps_updated_ = true;
+  
 }
 
 void NavSatTransform::imuCallback(const sensor_msgs::msg::Imu::SharedPtr msg)

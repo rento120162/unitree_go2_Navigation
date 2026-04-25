@@ -41,7 +41,7 @@ def generate_launch_description():
 	        output='screen',
             parameters=[rl_params_file, {"use_sim_time": True}],
             remappings=[('imu/data', '/imu/data'),
-                        ('lio_odom/odom', '/odom_fixed'),
+                        ('lio_odom/odom', '/lio_odom_fixed'),
                         ('odometry/filtered', '/odometry/local')]           
            ),
     launch_ros.actions.Node(
@@ -60,7 +60,7 @@ def generate_launch_description():
             name='navsat_transform_node',
 	        output='screen',
             parameters=[rl_params_file, {"use_sim_time": True}],
-            remappings=[('imu/data', '/imu/data'),
+            remappings=[('imu', '/imu/data'),
                         ('gps/fix', '/gps/fix'), 
                         ('odometry/filtered', '/odometry/global')]              
 

@@ -11,10 +11,10 @@ public:
     : Node("odom_frame_fixer")
     {
         odom_sub_ = this->create_subscription<nav_msgs::msg::Odometry>("/Odometry",10,std::bind(&OdomFrameFixer::odomcallback, this, std::placeholders::_1));
-        pc2_sub_ = this->create_subscription<sensor_msgs::msg::PointCloud2>("/cloud_registed",10,std::bind(&OdomFrameFixer::pc2callback, this, std::placeholders::_1));
+        pc2_sub_ = this->create_subscription<sensor_msgs::msg::PointCloud2>("/cloud_registered",10,std::bind(&OdomFrameFixer::pc2callback, this, std::placeholders::_1));
 
         odom_pub_ = this->create_publisher<nav_msgs::msg::Odometry>("/lio_odom_fixed",10);
-        pc2_pub_ = this->create_publisher<sensor_msgs::msg::PointCloud2>("/cloud_registed_fixed",10);
+        pc2_pub_ = this->create_publisher<sensor_msgs::msg::PointCloud2>("/cloud_registered_fixed",10);
 
         RCLCPP_INFO(this->get_logger(), "odom_frame_fixer started");
     }
@@ -25,7 +25,7 @@ private:
         auto odom = *msg;
 
         odom.header.frame_id = "odom";
-        odom.child_frame_id = "base_footprint";
+        odom.child_frame_id = "base_link";
 
         odom_pub_->publish(odom);
     }
@@ -34,7 +34,7 @@ private:
     {
         auto pc2 = *msg;
 
-        pc2.header.frame_id = "odom";
+        pc2.header.frame_id = "velodyne";
 
         pc2_pub_->publish(pc2);
     }
