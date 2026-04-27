@@ -12,15 +12,23 @@ from launch_ros.actions import Node
 
 def generate_launch_description():
     package_path = get_package_share_directory('fast_lio')
+    parameter_file = LaunchConfiguration('params_file')
     default_config_path = os.path.join(package_path, 'config')
     default_rviz_config_path = os.path.join(
         package_path, 'rviz', 'fastlio.rviz')
+    
 
     use_sim_time = LaunchConfiguration('use_sim_time')
     config_path = LaunchConfiguration('config_path')
     config_file = LaunchConfiguration('config_file')
     rviz_use = LaunchConfiguration('rviz')
     rviz_cfg = LaunchConfiguration('rviz_cfg')
+    
+    declare_tf_params = DeclareLaunchArgument(
+        'params_file',
+        default_value=os.path.join(
+            package_path, 'config', 'params.yaml'),
+        description='FPath to the ROS2 parameters file to use.')
 
     declare_use_sim_time_cmd = DeclareLaunchArgument(
         'use_sim_time', default_value='false',
@@ -42,6 +50,14 @@ def generate_launch_description():
         'rviz_cfg', default_value=default_rviz_config_path,
         description='RViz config file path'
     )
+    
+    robot_state_node = Node(
+        package='tf2_ros',
+        executable='static_transform_publisher',
+        arguments='0.0 0.0 0.0 0.0 0.0 0.0 map odom'.split(' '),
+        parameters=[parameter_file],
+        output='screen'
+    )
 
     fast_lio_node = Node(
         package='fast_lio',
@@ -58,12 +74,15 @@ def generate_launch_description():
     )
 
     ld = LaunchDescription()
+    
+    ld.add_action(declare_tf_params)
     ld.add_action(declare_use_sim_time_cmd)
     ld.add_action(declare_config_path_cmd)
     ld.add_action(declare_config_file_cmd)
     ld.add_action(declare_rviz_cmd)
     ld.add_action(declare_rviz_config_path_cmd)
 
+    ld.add_action(robot_state_node)
     ld.add_action(fast_lio_node)
     ld.add_action(rviz_node)
 

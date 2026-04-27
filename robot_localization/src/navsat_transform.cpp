@@ -620,7 +620,7 @@ void NavSatTransform::gpsFixCallback(
   // Make sure the GPS data is usable
   bool good_gps =
     (msg->status.status > sensor_msgs::msg::NavSatStatus::STATUS_FIX &&
-    msg->position_covariance[0] + msg->position_covariance[4] < gpsCovThreshold_
+    msg->position_covariance[0] + msg->position_covariance[4] < gpsCovThreshold_ &&
     !std::isnan(msg->altitude) && !std::isnan(msg->latitude) &&
     !std::isnan(msg->longitude));
 
